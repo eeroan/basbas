@@ -3,7 +3,7 @@ const https = require('https')
 const url = require('url')
 const fs = require('fs')
 const path = require('path')
-const parser = require('./parser')
+const dateUtil = require('./dateUtil')
 const port = process.env.PORT || 5000
 const startMsg = '\033[33mServer started in \033[36mhttp://localhost:' + port + ', \033[33mtook \033[39m'
 const startedTime = new Date().toString()
@@ -38,7 +38,7 @@ const writePage = res => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
   res.write('<!DOCTYPE html>')
   res.write(head)
-  const dates = [...Array(33).keys()].map(delta => parser.addDay(parser.toMidnight(new Date()), delta)).filter(parser.isOpen)
+  const dates = [...Array(33).keys()].map(delta => dateUtil.addDay(dateUtil.toMidnight(new Date()), delta)).filter(dateUtil.isOpen)
   combineArray(dates, (dayAvailabilities) => {
     res.end(
       dayAvailabilities.map(({date, body}) => {
@@ -46,7 +46,7 @@ const writePage = res => {
           .replace(/\\n/g, '')
           .replace(/\\/g, "")
         return `<article>
-<h1>${parser.formatDate(date)}</h1>
+<h1>${dateUtil.formatDate(date)}</h1>
         ${markup}
         </article>`
       }).join('\n'))
@@ -58,7 +58,7 @@ const notFound = res => {
   res.end()
 }
 const dateToUrl = date => {
-  return `${urlForDate}${parser.formatReverseIsoDate(date)}`
+  return `${urlForDate}${dateUtil.formatReverseIsoDate(date)}`
 }
 const combineArray = (dates, cb) => {
   const results = []
