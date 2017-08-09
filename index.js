@@ -8,7 +8,6 @@ const port = process.env.PORT || 5000
 const startMsg = '\033[33mServer started in \033[36mhttp://localhost:' + port + ', \033[33mtook \033[39m'
 const startedTime = new Date().toString()
 const baseUrl = 'http://v2.tableonline.fi/instabook/bookings'
-const startUrl = `${baseUrl}/t7c5hxB`
 const urlForDate = `${baseUrl}/availabilities/t7c5hxB/589/2?locale=fi&date=`
 console.time(startMsg)
 http.createServer((req, res) => {
@@ -117,5 +116,3 @@ const head = `<html>
 <p class="subtitle"><a href="http://basbas.fi/bistro#reservation" target="_blank">Varaa täältä</a></p>
 </header>
 </article>`
-
-
