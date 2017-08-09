@@ -1,14 +1,12 @@
-
 const formatDate = (date) => {
   return `${weekdays[date.getDay()]} ${date.getDate()}.${date.getMonth() + 1}`
 }
 
-const formatReverseIsoDate = (date) => {
-  const components = date.toISOString().split('T')[0].split('-')
-  return `${components[2]}-${components[1]}-${components[0]}`
-}
+const pad = number => (number < 10 ? '0' : '') + number
 
-const addDay = (date, days)=> {
+const formatReverseIsoDate = (date) => `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}`
+
+const addDay = (date, days) => {
   const newDate = new Date(date.getTime())
   newDate.setDate(newDate.getDate() + days)
   return newDate
@@ -21,7 +19,7 @@ const strToDate = str => {
   return new Date(+dmy[2], (+dmy[1] - 1), +dmy[0])
 }
 
-const notSunday = date => date.getDay() !== 0
+const isOpen = date => date.getDay() !== 0 && date.getDay() !== 1 && date.getDay() !== 6
 
 const toMidnight = date => {
   date.setHours(0)
@@ -36,5 +34,5 @@ module.exports = {
   formatReverseIsoDate,
   addDay,
   toMidnight,
-  notSunday
+  isOpen
 }
