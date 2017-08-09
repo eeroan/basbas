@@ -1,3 +1,3 @@
-# kotilounas
+# Basbas table reservations 
 
-https://kotilounas.herokuapp.com
+https://basbas.herokuapp.com
