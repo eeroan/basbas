@@ -38,7 +38,7 @@ const writePage = res => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
   res.write('<!DOCTYPE html>')
   res.write(head)
-  const dates = [...Array(30).keys()].map(delta => parser.addDay(parser.toMidnight(new Date()), delta)).filter(parser.notSunday)
+  const dates = [...Array(33).keys()].map(delta => parser.addDay(parser.toMidnight(new Date()), delta)).filter(parser.notSunday)
   combineArray(dates, (dayAvailabilities) => {
     res.end(
       dayAvailabilities.map(({date, body}) => {
