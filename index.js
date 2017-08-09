@@ -112,8 +112,10 @@ const head = `<html>
 </head>
 <body>
 <article>
-<h1>Basbas vapaat pöytävaraukset</h1>
-<a href="http://basbas.fi/bistro#reservation">Varaa täältä</a>
-<p class="subtitle">Tänään on ${parser.formatDate(new Date())}.</p></article>`
+<header>
+<h1>Basbas pöytä&shy;varaukset</h1>
+<p class="subtitle"><a href="http://basbas.fi/bistro#reservation" target="_blank">Varaa täältä</a></p>
+</header>
+</article>`
 
 
