@@ -48,7 +48,7 @@ const writePage = res => {
 <h1>${dateUtil.formatDate(date)}</h1>
         ${markup}
         </article>`
-      }).join('\n'))
+      }).join('\n') + `<article><a href="https://github.com/eeroan/basbas" target="_blank">Lähdekoodi</a></article></body></html>`)
   })
 }
 
