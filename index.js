@@ -102,6 +102,13 @@ const get = (uri, cb) => {
 const head = `<html>
 <head>
 <!-- Server started: ${startedTime}-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-4154602-10"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-4154602-10');
+</script>
 <title>Basbas</title>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
