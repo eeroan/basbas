@@ -8,13 +8,22 @@ const port = process.env.PORT || 5000
 const startMsg = '\033[33mServer started in \033[36mhttp://localhost:' + port + ', \033[33mtook \033[39m'
 const startedTime = new Date().toString()
 const baseUrl = 'https://v2.tableonline.fi/instabook/bookings'
-const urlForDate = `${baseUrl}/availabilities/t7c5hxB/589/2?locale=fi&date=`
+const urlForDate = persons => `${baseUrl}/availabilities/t7c5hxB/589/${persons}?locale=fi&date=`
 console.time(startMsg)
 http.createServer((req, res) => {
-  const uri = url.parse(req.url).pathname
+  const parsedUrl = url.parse(req.url, true)
+  const uri = parsedUrl.pathname
   const isGet = req.method === 'GET'
   if (isGet && uri === '/') {
-    writePage(res)
+    let persons = 2
+    if (parsedUrl.query && parsedUrl.query.persons) {
+      persons = Number(parsedUrl.query.persons)
+      if (persons < 1) {
+        notFound(res)
+        return
+      }
+    }
+    writePage(res, persons)
   }
 
   else if (isGet && uri.startsWith('/public'))
@@ -33,12 +42,12 @@ const serveStatic = (uri, res) => {
     res.end()
   })
 }
-const writePage = res => {
+const writePage = (res, persons) => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
   res.write('<!DOCTYPE html>')
   res.write(head)
   const dates = [...Array(33).keys()].map(delta => dateUtil.addDay(dateUtil.toMidnight(new Date()), delta)).filter(dateUtil.isOpen)
-  combineArray(dates, (dayAvailabilities) => {
+  combineArray(dates, persons, (dayAvailabilities) => {
     res.end(
       dayAvailabilities.map(({date, body}) => {
         const markup = body.match(/\$\("#availabilities"\)\.html\('([\s\S]*)'\);/)[1]
@@ -56,12 +65,12 @@ const notFound = res => {
   res.writeHead(404)
   res.end()
 }
-const dateToUrl = date => {
-  return `${urlForDate}${dateUtil.formatReverseIsoDate(date)}`
+const dateToUrl = (date, persons) => {
+  return `${urlForDate(persons)}${dateUtil.formatReverseIsoDate(date)}`
 }
-const combineArray = (dates, cb) => {
+const combineArray = (dates, persons, cb) => {
   const results = []
-  dates.forEach((date, index) => getCached(dateToUrl(date), body => {
+  dates.forEach((date, index) => getCached(dateToUrl(date, persons), body => {
     results[index] = {
       date,
       body
