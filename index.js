@@ -33,23 +33,22 @@ const serveStatic = (uri, res) => {
     res.end()
   })
 }
-const writePage = (res, persons) => {
+const writePage = async (res, persons) => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
   res.write('<!DOCTYPE html>')
   res.write(head)
   const dates = [...Array(33).keys()].map(delta => dateUtil.addDay(dateUtil.toMidnight(new Date()), delta)).filter(dateUtil.isOpen)
-  combineArray(dates, persons, (dayAvailabilities) => {
-    res.end(
-      dayAvailabilities.map(({date, body}) => {
-        const markup = body.match(/\$\("#availabilities"\)\.html\('([\s\S]*)'\);/)[1]
-          .replace(/\\n/g, '')
-          .replace(/\\/g, "")
-        return `<article>
+  const dayAvailabilities = await combineArray(dates, persons)
+  res.end(
+    dayAvailabilities.map(({date, body}) => {
+      const markup = body.match(/\$\("#availabilities"\)\.html\('([\s\S]*)'\);/)[1]
+        .replace(/\\n/g, '')
+        .replace(/\\/g, "")
+      return `<article>
 <h1>${dateUtil.formatDate(date)}</h1>
-        ${markup}
-        </article>`
-      }).join('\n') + `<article><a href="https://github.com/eeroan/basbas" target="_blank">Lähdekoodi</a></article></body></html>`)
-  })
+      ${markup}
+      </article>`
+    }).join('\n') + `<article><a href="https://github.com/eeroan/basbas" target="_blank">Lähdekoodi</a></article></body></html>`)
 }
 
 const notFound = res => {
@@ -59,26 +58,21 @@ const notFound = res => {
 const dateToUrl = (date, persons) => {
   return `${urlForDate(persons)}${dateUtil.formatReverseIsoDate(date)}`
 }
-const combineArray = (dates, persons, cb) => {
-  const results = []
-  dates.forEach((date, index) => getCached(dateToUrl(date, persons), body => {
-    results[index] = {
-      date,
-      body
-    }
-    if (Object.keys(results).length === dates.length) cb(results)
-  }))
+const combineArray = async (dates, persons) => Promise.all(dates.map(date => dateAndBody(date, persons)))
+const dateAndBody = async (date, persons) => {
+  const body = await getCached(dateToUrl(date, persons))
+  return {date, body}
+}
+const responses = {}
+const getCached = async (url) => {
+  if (url in responses)
+    return responses[url]
+  const data = await get(url)
+  responses[url] = data
+  return data
 }
 
-const responses = {}
-const getCached = (url, cb) => {
-  if (url in responses) cb(responses[url])
-  else get(url, data => {
-    responses[url] = data
-    cb(data)
-  })
-}
-const get = (uri, cb) => {
+const get = async (uri) => new Promise(resolve => {
   let parsed = url.parse(uri)
   const options = {
     hostname: parsed.hostname,
@@ -93,11 +87,11 @@ const get = (uri, cb) => {
     const chunks = []
     res.setEncoding('utf8')
     res.on('data', chunk => chunks.push(chunk))
-    res.on('end', () => cb(chunks.join('')))
+    res.on('end', () => resolve(chunks.join('')))
   }
   if (uri.startsWith('https')) https.get(options, cbFunc)
   else http.get(options, cbFunc)
-}
+})
 
 const head = `<html>
 <head>
