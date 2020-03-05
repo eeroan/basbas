@@ -14,19 +14,10 @@ http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true)
   const uri = parsedUrl.pathname
   const isGet = req.method === 'GET'
-  if (isGet && uri === '/') {
-    let persons = 2
-    if (parsedUrl.query && parsedUrl.query.persons) {
-      persons = Number(parsedUrl.query.persons)
-      if (persons < 1) {
-        notFound(res)
-        return
-      }
-    }
+  const persons = parsedUrl.query && parsedUrl.query.persons ? Number(parsedUrl.query.persons) : 2
+  if (isGet && uri === '/' && persons >= 1) {
     writePage(res, persons)
-  }
-
-  else if (isGet && uri.startsWith('/public'))
+  } else if (isGet && uri.startsWith('/public'))
     serveStatic(uri, res)
   else
     notFound(res)
