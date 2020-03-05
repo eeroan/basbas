@@ -73,11 +73,11 @@ const getCached = async (url) => {
 }
 
 const get = async (uri) => new Promise(resolve => {
-  let parsed = url.parse(uri)
+  const {hostname, path, query} = url.parse(uri)
   const options = {
-    hostname: parsed.hostname,
-    path: parsed.path,
-    query: parsed.query,
+    hostname,
+    path,
+    query,
     headers: {
       'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
       Accept: '*/*'
